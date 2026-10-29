@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Ficha de Campo NDT Pro - Inspeção Industrial</title>
+  <meta name="theme-color" content="#0b2238" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --primary: #0f355c;
+      --primary-light: #1e4d7d;
+      --secondary: #008080;
+      --accent: #f59e0b;
+      --danger: #ef4444;
+      --success: #10b981;
+      --border: #cbd5e1;
+      --input-bg: #f8fafc;
+      --header-bg: linear-gradient(135deg, #0f355c, #07192b);
+    }
+
+    body.dark-mode {
+      --bg: #0b131e;
+      --card-bg: #152232;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --border: #334155;
+      --input-bg: #1a2a3e;
+      --header-bg: #0f1c2c;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 95px; transition: background-color 0.2s; }
+    
+    /* Header Top */
+    header.app-header {
+      background: var(--header-bg);
+      color: white;
+      padding: 10px 14px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header-title { font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; gap: 6px; letter-spacing: -0.3px; }
+    .header-actions { display: flex; gap: 6px; align-items: center; }
+    .btn-header {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.15s;
+    }
+    .btn-header:active { background: rgba(255,255,255,0.3); }
+
+    /* Barra de Seleção Rápida de Folhas */
+    .sheet-selector-bar {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      position: sticky;
+      top: 48px;
+      z-index: 990;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+    }
+    .sheet-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-weight: 600;
+      user-select: none;
+    }
+    .sheet-pill.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    .btn-manage-sheets {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px dashed #f59e0b;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    /* Container Principal */
+    .container { max-width: 920px; margin: 12px auto; padding: 0 10px; }
+
+    /* Cartões de Seção */
+    .sheet-card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      overflow: hidden;
+      display: none;
+    }
+    .sheet-card.visible { display: block; }
+    
+    .card-header {
+      background: var(--input-bg);
+      padding: 12px 16px;
+      border-bottom: 2px solid var(--primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-header h2 { font-size: 1rem; color: var(--primary); font-weight: 700; }
+    body.dark-mode .card-header h2 { color: #60a5fa; }
+    .card-body { padding: 14px 16px; }
+
+    .section-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-left: 4px solid var(--secondary);
+      padding-left: 8px;
+      margin: 14px 0 10px 0;
+    }
+    .section-title:first-child { margin-top: 0; }
+
+    /* Grids e Inputs */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group.full-width { grid-column: 1 / -1; }
+    .form-group label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
+    
+    input[type="text"], input[type="date"], input[type="number"], select, textarea {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.92rem;
+      background: var(--input-bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+    }
+    textarea { resize: vertical; min-height: 56px; }
+
+    .checkbox-group, .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 3px;
+    }
+    .checkbox-label, .radio-label {
+      font-size: 0.83rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      background: var(--input-bg);
+      padding: 6px 10px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      color: var(--text);
+      user-select: none;
+    }
+    .checkbox-label input, .radio-label input { cursor: pointer; accent-color: var(--primary); }
+
+    /* Botões Táteis Grandes de Seleção Rápida (OK, NC, NA) */
+    .pill-btn-group {
+      display: flex;
+      gap: 4px;
+      background: var(--input-bg);
+      padding: 3px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      width: fit-content;
+    }
+    .pill-btn {
+      border: none;
+      background: transparent;
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pill-btn.active-ok { background: var(--success); color: white; }
+    .pill-btn.active-nc { background: var(--danger); color: white; }
+    .pill-btn.active-na { background: #64748b; color: white; }
+
+    /* Tabelas */
+    .table-container { width: 100%; overflow-x: auto; margin-top: 6px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 6px; }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      background: var(--card-bg);
+    }
+    table.data-table th, table.data-table td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+    }
+    table.data-table th { background: var(--input-bg); color: var(--text); font-weight: 700; }
+    table.data-table tr:nth-child(even) { background: rgba(0,0,0,0.015); }
+
+    /* Matriz de Medição de Espessura com Auto-Avanço */
+    .me-summary-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: #dbeafe;
+      border: 1px solid #93c5fd;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+      color: #1e3a8a;
+    }
+    body.dark-mode .me-summary-bar { background: #1e293b; border-color: #3b82f6; color: #93c5fd; }
+    .me-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 6px;
+      max-height: 480px;
+      overflow-y: auto;
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card-bg);
+    }
+    .me-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 6px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+    }
+    .me-item.reproved {
+      background: #fee2e2 !important;
+      border-color: #ef4444 !important;
+    }
+    body.dark-mode .me-item.reproved {
+      background: #450a0a !important;
+      border-color: #dc2626 !important;
+    }
+    .me-item span.pt-num {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      min-width: 24px;
+    }
+    .me-item input {
+      padding: 4px 6px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      width: 58px;
+      text-align: right;
+    }
+
+    /* Painel de Assinatura Digital Touch */
+    .sig-block {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      background: var(--input-bg);
+      margin-top: 4px;
+    }
+    .sig-canvas {
+      width: 100%;
+      height: 110px;
+      background: #ffffff;
+      border: 1px dashed #94a3b8;
+      border-radius: 4px;
+      touch-action: none;
+      cursor: crosshair;
+    }
+    .sig-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    /* Modais */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      padding: 14px;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal-content {
+      background: var(--card-bg);
+      color: var(--text);
+      border-radius: 10px;
+      max-width: 540px;
+      width: 100%;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      overflow: hidden;
+      animation: popIn 0.18s ease-out;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.94); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-header {
+      background: var(--header-bg);
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-body { padding: 16px; max-height: 75vh; overflow-y: auto; }
+    .sheet-toggle-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 8px;
+      background: var(--input-bg);
+    }
+    .sheet-toggle-item.required { opacity: 0.8; }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #94a3b8;
+      transition: .25s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+      background-color: white;
+      transition: .25s;
+      border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--secondary); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* Barra Inferior Fixa de Ações */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border);
+      padding: 8px 14px;
+      display: flex;
+      justify-content: space-around;
+      gap: 8px;
+      box-shadow: 0 -3px 10px rgba(0,0,0,0.08);
+      z-index: 1000;
+    }
+    .btn-action {
+      flex: 1;
+      padding: 11px 10px;
+      border-radius: 7px;
+      border: none;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-save { background: #10b981; color: white; }
+    .btn-pdf { background: #dc2626; color: white; }
+    .btn-share { background: #0284c7; color: white; }
+
+    /* Histórico */
+    .history-card {
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 10px;
+      margin-bottom: 8px;
+      background: var(--input-bg);
+    }
+    .history-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .history-card-actions { display: flex; gap: 6px; margin-top: 8px; border-top: 1px solid var(--border); padding-top: 6px; }
+    .btn-hist {
+      flex: 1;
+      padding: 6px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-hist.primary { background: var(--primary); color: white; border: none; }
+    .btn-hist.danger { color: var(--danger); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: white;
+      padding: 9px 18px;
+      border-radius: 30px;
+      font-size: 0.82rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 2500;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .toast.show { opacity: 1; }
+
+    /* REGRAS DE IMPRESSÃO / PDF A4 */
+    @media print {
+      body { background: white !important; color: black !important; padding-bottom: 0 !important; }
+      .app-header, .sheet-selector-bar, .bottom-bar, .modal-backdrop, .btn-manage-sheets, .sig-controls, .no-print {
+        display: none !important;
+      }
+      .container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+      .sheet-card {
+        display: none !important;
+        border: 1px solid #777 !important;
+        box-shadow: none !important;
+        margin-bottom: 0 !important;
+        page-break-after: always;
+        break-after: page;
+      }
+      .sheet-card.visible { display: block !important; }
+      .card-header {
+        background: #f1f5f9 !important;
+        color: black !important;
+        border-bottom: 2px solid #333 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .card-header h2 { color: black !important; font-size: 11pt; }
+      .card-body { padding: 8px !important; }
+      .section-title {
+        border-left: 3px solid #333 !important;
+        font-size: 9.5pt !important;
+        margin: 8px 0 5px 0 !important;
+        color: black !important;
+      }
+      input, select, textarea {
+        border: 1px solid #999 !important;
+        background: white !important;
+        color: black !important;
+        font-size: 8pt !important;
+      }
+      table.data-table th, table.data-table td {
+        font-size: 7.5pt !important;
+        padding: 3px 5px !important;
+        border: 1px solid #777 !important;
+      }
+      table.data-table th { background: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .me-grid { max-height: none !important; overflow: visible !important; grid-template-columns: repeat(8, 1fr) !important; gap: 3px !important; }
+      .me-item { border: 1px solid #888 !important; padding: 2px !important; font-size: 7pt !important; }
+      .me-item input { font-size: 7pt !important; width: 40px !important; }
+      .sig-canvas { border: 1px solid #333 !important; height: 90px !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topo -->
+  <header class="app-header">
+    <div class="header-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="m9 14 2 2 4-4"/></svg>
+      Ficha NDT Pro
+    </div>
+    <div class="header-actions">
+      <button class="btn-header" onclick="toggleTheme()" title="Alternar Modo Sol/Escuro">☀️/🌙</button>
+      <button class="btn-header" onclick="novaInspecao()" title="Nova Inspeção">+ Nova</button>
+      <button class="btn-header" onclick="openHistoryModal()" title="Histórico">Histórico (<span id="histCount">0</span>)</button>
+      <button class="btn-header" onclick="openSheetModal()" title="Gerenciar Folhas">Folhas</button>
+    </div>
+  </header>
+
+  <!-- Barra de Seleção Rápida de Folhas -->
+  <nav class="sheet-selector-bar" id="sheetPillContainer">
+    <!-- Gerado dinamicamente -->
+  </nav>
+
+  <!-- Container de Formulários -->
+  <main class="container" id="formRoot">
+
+    <!-- ==================== FOLHA 1: GERAL ==================== -->
+    <div class="sheet-card visible" id="sheet-folha1" data-sheet-id="folha1">
+      <div class="card-header">
+        <h2>Ficha de Campo – Folha 1: Geral</h2>
+        <span style="font-size:0.75rem; font-weight:700; color:var(--primary); background:#dbeafe; padding:2px 8px; border-radius:4px;">OBRIGATÓRIA</span>
+      </div>
+      <div class="card-body">
+        
+        <div class="section-title">1. Identificação do Serviço</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nº da Nota / Plano de inspeção</label>
+            <input type="text" name="f1_nota_plano" placeholder="Ex: 50012345" />
+          </div>
+          <div class="form-group">
+            <label>Escopo</label>
+            <input type="text" name="f1_escopo" placeholder="Escopo da inspeção" />
+          </div>
+          <div class="form-group">
+            <label>Equipamento / Estrutura (ativo)</label>
+            <input type="text" name="f1_ativo" placeholder="Nome do equipamento" />
+          </div>
+          <div class="form-group">
+            <label>TAG</label>
+            <input type="text" id="f1_tag_input" name="f1_tag" placeholder="Ex: TK-101 / VP-204" />
+          </div>
+          <div class="form-group">
+            <label>Regiões inspecionadas</label>
+            <input type="text" name="f1_regioes" placeholder="Ex: Costado, Teto, Bocais" />
+          </div>
+          <div class="form-group">
+            <label>Data da inspeção</label>
+            <input type="date" id="f1_data_input" name="f1_data" />
+          </div>
+          <div class="form-group full-width">
+            <label>Inspetor(es)</label>
+            <input type="text" name="f1_inspetores" placeholder="Nome(s) completo(s)" />
+          </div>
+          <div class="form-group full-width">
+            <label>Projeto / desenho do ativo apresentado?</label>
+            <div class="checkbox-group">
+              <label class="radio-label"><input type="radio" name="f1_desenho_apresentado" value="Nao" checked /> Não</label>
+              <label class="radio-label"><input type="radio" name="f1_desenho_apresentado" value="Sim" /> Sim — Nº:</label>
+              <input type="text" name="f1_desenho_num" placeholder="Nº do desenho" style="max-width:200px;" />
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label>Base da espessura nominal e mínima</label>
+            <div class="checkbox-group">
+              <label class="radio-label"><input type="radio" name="f1_base_esp" value="Desenho" /> Desenho nº:</label>
+              <input type="text" name="f1_base_esp_desenho" placeholder="Nº" style="max-width:130px;" />
+              <label class="radio-label"><input type="radio" name="f1_base_esp" value="Norma" /> Norma e item:</label>
+              <input type="text" name="f1_base_esp_norma" placeholder="Norma" style="max-width:130px;" />
+              <label class="radio-label"><input type="radio" name="f1_base_esp" value="Orientacao" /> Orientação do eng.:</label>
+              <input type="text" name="f1_base_esp_eng" placeholder="Nome, gerência, data" style="flex:1;" />
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title">2. Condições Climáticas e Ambientais</div>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label>Tempo</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label"><input type="checkbox" name="f1_tempo_ensolarado" /> Ensolarado</label>
+              <label class="checkbox-label"><input type="checkbox" name="f1_tempo_nublado" /> Nublado</label>
+              <label class="checkbox-label"><input type="checkbox" name="f1_tempo_chuva" /> Chuva</label>
+              <label class="checkbox-label"><input type="checkbox" name="f1_tempo_garoa" /> Garoa</label>
+              <label class="checkbox-label"><input type="checkbox" name="f1_tempo_vento" /> Vento forte</label>
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label>Visibilidade</label>
+            <div class="checkbox-group">
+              <label class="radio-label"><input type="radio" name="f1_visibilidade" value="Apropriada" checked /> Apropriada</label>
+              <label class="radio-label"><input type="radio" name="f1_visibilidade" value="Inapropriada" /> Inapropriada — Motivo:</label>
+              <input type="text" name="f1_visibilidade_motivo" placeholder="Descreva o motivo" style="flex:1;" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Temperatura da superfície (°C)</label>
+            <input type="number" step="0.1" inputmode="decimal" name="f1_temp_superficie" placeholder="Ex: 32.5" />
+          </div>
+          <div class="form-group">
+            <label>Iluminação no local (lux) / Luz branca</label>
+            <input type="number" inputmode="numeric" name="f1_iluminacao" placeholder="Ex: 1100" />
+          </div>
+          <div class="form-group full-width">
+            <label>Local de trabalho</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label"><input type="checkbox" name="f1_loc_aberto" /> Aberto</label>
+              <label class="checkbox-label"><input type="checkbox" name="f1_loc_fechado" /> Fechado</label>
+              <label class="checkbox-label"><input type="checkbox" name="f1_loc_confinado" /> Espaço confinado</label>
+              <label class="checkbox-label"><input type="checkbox" name="f1_loc_altura" /> Trabalho em altura</label>
+              <label class="checkbox-label"><input type="checkbox" name="f1_loc_cordas" /> Acesso por cordas</label>
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label>Condição da Superfície</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label"><input type="checkbox" name="f1_sup_limpa" /> Limpa</label>
+              <label class="checkbox-label"><input type="checkbox" name="f1_sup_corroída" /> Corroída</label>
+              <label class="checkbox-label"><input type="checkbox" name="f1_sup_pintada" /> Pintada</label>
+              <label class="checkbox-label"><input type="checkbox" name="f1_sup_residuos" /> Com resíduos</label>
+              <label class="checkbox-label"><input type="checkbox" name="f1_sup_preparada" /> Preparada</label>
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label>Interferências durante o ensaio</label>
+            <input type="text" name="f1_interferencias" placeholder="Vibração, terceiros, parada de processo..." />
+          </div>
+          <div class="form-group full-width">
+            <label>Condição impediu ou limitou o ensaio?</label>
+            <div class="checkbox-group">
+              <label class="radio-label"><input type="radio" name="f1_impediu" value="Nao" checked /> Não</label>
+              <label class="radio-label"><input type="radio" name="f1_impediu" value="Sim" /> Sim — Descrever:</label>
+              <input type="text" name="f1_impediu_desc" style="flex:1;" />
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title">3. Ensaios Realizados e Quantidades</div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width:160px;">Ensaio</th>
+                <th style="width:55px; text-align:center;">Realiz.</th>
+                <th>Abrangência (elementos / regiões)</th>
+                <th style="width:110px;">Qtd. Pontos/Soldas</th>
+                <th>Critério / Procedimento</th>
+                <th>Observações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Inspeção Visual (VT)</strong></td>
+                <td style="text-align:center;"><input type="checkbox" name="f1_tab_vt_chk" onchange="autoSyncSheet('folha2', this.checked)" /></td>
+                <td><input type="text" name="f1_tab_vt_abrang" /></td>
+                <td><input type="text" name="f1_tab_vt_qtd" /></td>
+                <td><input type="text" name="f1_tab_vt_norma" /></td>
+                <td><input type="text" name="f1_tab_vt_obs" /></td>
+              </tr>
+              <tr>
+                <td><strong>Líquido Penetrante (LP)</strong></td>
+                <td style="text-align:center;"><input type="checkbox" name="f1_tab_lp_chk" onchange="autoSyncSheet('folha3', this.checked)" /></td>
+                <td><input type="text" name="f1_tab_lp_abrang" /></td>
+                <td><input type="text" name="f1_tab_lp_qtd" /></td>
+                <td><input type="text" name="f1_tab_lp_norma" /></td>
+                <td><input type="text" name="f1_tab_lp_obs" /></td>
+              </tr>
+              <tr>
+                <td><strong>Partícula Magnética (PM)</strong></td>
+                <td style="text-align:center;"><input type="checkbox" name="f1_tab_pm_chk" onchange="autoSyncSheet('folha6', this.checked)" /></td>
+                <td><input type="text" name="f1_tab_pm_abrang" /></td>
+                <td><input type="text" name="f1_tab_pm_qtd" /></td>
+                <td><input type="text" name="f1_tab_pm_norma" /></td>
+                <td><input type="text" name="f1_tab_pm_obs" /></td>
+              </tr>
+              <tr>
+                <td><strong>Medição de Espessura (ME)</strong></td>
+                <td style="text-align:center;"><input type="checkbox" name="f1_tab_me_chk" onchange="autoSyncSheet('folha4', this.checked)" /></td>
+                <td><input type="text" name="f1_tab_me_abrang" /></td>
+                <td><input type="text" name="f1_tab_me_qtd" /></td>
+                <td><input type="text" name="f1_tab_me_norma" /></td>
+                <td><input type="text" name="f1_tab_me_obs" /></td>
+              </tr>
+              <tr>
+                <td><strong>Ultrassom Industrial (UT)</strong></td>
+                <td style="text-align:center;"><input type="checkbox" name="f1_tab_ut_chk" onchange="autoSyncSheet('folha5', this.checked)" /></td>
+                <td><input type="text" name="f1_tab_ut_abrang" /></td>
+                <td><input type="text" name="f1_tab_ut_qtd" /></td>
+                <td><input type="text" name="f1_tab_ut_norma" /></td>
+                <td><input type="text" name="f1_tab_ut_obs" /></td>
+              </tr>
+              <tr>
+                <td><strong>Esclerometria</strong></td>
+                <td style="text-align:center;"><input type="checkbox" name="f1_tab_escl_chk" onchange="autoSyncSheet('folha7', this.checked)" /></td>
+                <td><input type="text" name="f1_tab_escl_abrang" /></td>
+                <td><input type="text" name="f1_tab_escl_qtd" /></td>
+                <td><input type="text" name="f1_tab_escl_norma" /></td>
+                <td><input type="text" name="f1_tab_escl_obs" /></td>
+              </tr>
+              <tr>
+                <td><strong>Carbonatação</strong></td>
+                <td style="text-align:center;"><input type="checkbox" name="f1_tab_carb_chk" onchange="autoSyncSheet('folha7', this.checked)" /></td>
+                <td><input type="text" name="f1_tab_carb_abrang" /></td>
+                <td><input type="text" name="f1_tab_carb_qtd" /></td>
+                <td><input type="text" name="f1_tab_carb_norma" /></td>
+                <td><input type="text" name="f1_tab_carb_obs" /></td>
+              </tr>
+              <tr>
+                <td><strong>Potencial de Corrosão</strong></td>
+                <td style="text-align:center;"><input type="checkbox" name="f1_tab_pot_chk" onchange="autoSyncSheet('folha7', this.checked)" /></td>
+                <td><input type="text" name="f1_tab_pot_abrang" /></td>
+                <td><input type="text" name="f1_tab_pot_qtd" /></td>
+                <td><input type="text" name="f1_tab_pot_norma" /></td>
+                <td><input type="text" name="f1_tab_pot_obs" /></td>
+              </tr>
+              <tr>
+                <td><input type="text" name="f1_tab_outro_nome" placeholder="Outro ensaio..." /></td>
+                <td style="text-align:center;"><input type="checkbox" name="f1_tab_outro_chk" /></td>
+                <td><input type="text" name="f1_tab_outro_abrang" /></td>
+                <td><input type="text" name="f1_tab_outro_qtd" /></td>
+                <td><input type="text" name="f1_tab_outro_norma" /></td>
+                <td><input type="text" name="f1_tab_outro_obs" /></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section-title">4. Registros Finais e Assinaturas Digitais</div>
+        <div class="checkbox-group" style="margin-bottom:12px;">
+          <label class="checkbox-label"><input type="checkbox" name="f1_chk_fotos_gerais" /> Fotos gerais do ativo tiradas</label>
+          <label class="checkbox-label"><input type="checkbox" name="f1_chk_foto_tag" /> Foto geral do ativo com TAG visível</label>
+          <label class="checkbox-label"><input type="checkbox" name="f1_chk_fotos_ind" /> Fotos das anomalias identificadas</label>
+          <label class="checkbox-label"><input type="checkbox" name="f1_chk_croqui" /> Croqui / isométrico anexo</label>
+          <label class="checkbox-label"><input type="checkbox" name="f1_chk_certificados" /> Certificados de calibração conferidos</label>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label>Anomalias encontradas (descrição e localização)</label>
+            <textarea name="f1_anomalias"></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label>Pendências / Reinspeções necessárias</label>
+            <textarea name="f1_pendencias"></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label>Recomendações imediatas ao cliente</label>
+            <textarea name="f1_recomendacoes"></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label>Limitações de acesso</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label"><input type="checkbox" name="f1_lim_confinado" /> Confinado</label>
+              <label class="checkbox-label"><input type="checkbox" name="f1_lim_obstruido" /> Obstruído por equipamentos</label>
+              <label class="checkbox-label"><input type="checkbox" name="f1_lim_semacesso" /> Sem acesso seguro (andaime / PTA)</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Parecer preliminar do inspetor</label>
+            <div class="checkbox-group">
+              <label class="radio-label"><input type="radio" name="f1_parecer" value="Apto" checked /> <span style="color:var(--success); font-weight:700;">Apto</span></label>
+              <label class="radio-label"><input type="radio" name="f1_parecer" value="Inapto" /> <span style="color:var(--danger); font-weight:700;">Inapto para operar</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Próxima inspeção sugerida (meses)</label>
+            <input type="number" inputmode="numeric" name="f1_prox_inspecao" placeholder="Ex: 12" />
+          </div>
+
+          <!-- Assinatura do Inspetor -->
+          <div class="form-group full-width">
+            <label>Inspetor Responsável (Nome e Assinatura na Tela)</label>
+            <input type="text" name="f1_ass_inspetor_nome" placeholder="Nome do Inspetor" style="margin-bottom:4px;" />
+            <div class="sig-block">
+              <canvas id="sig_inspetor" class="sig-canvas"></canvas>
+              <div class="sig-controls">
+                <span style="font-size:0.75rem; color:var(--text-muted);">Assine com o dedo ou caneta stylus</span>
+                <button type="button" class="btn-hist" onclick="clearSig('sig_inspetor')">Limpar Assinatura</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assinatura do Cliente -->
+          <div class="form-group full-width">
+            <label>Acompanhante do Cliente (Nome e Assinatura na Tela)</label>
+            <input type="text" name="f1_ass_cliente_nome" placeholder="Nome do Representante / Fiscal" style="margin-bottom:4px;" />
+            <div class="sig-block">
+              <canvas id="sig_cliente" class="sig-canvas"></canvas>
+              <div class="sig-controls">
+                <span style="font-size:0.75rem; color:var(--text-muted);">Assine com o dedo ou caneta stylus</span>
+                <button type="button" class="btn-hist" onclick="clearSig('sig_cliente')">Limpar Assinatura</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== FOLHA 2: INSPEÇÃO VISUAL ==================== -->
+    <div class="sheet-card" id="sheet-folha2" data-sheet-id="folha2">
+      <div class="card-header">
+        <h2>Ficha de Campo – Folha 2: Inspeção Visual (VT)</h2>
+        <button class="btn-header" onclick="toggleSheetDirect('folha2')" style="color:var(--danger); border-color:var(--danger);">✕ Ocultar</button>
+      </div>
+      <div class="card-body">
+        <div class="section-title">Dados Específicos do Ensaio Visual</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Elementos inspecionados (abrangência)</label>
+            <input type="text" name="f2_abrangencia" />
+          </div>
+          <div class="form-group">
+            <label>Norma / Critério de Aceitação</label>
+            <input type="text" name="f2_norma_procedimento" />
+          </div>
+        </div>
+
+        <div class="section-title">Verificação de Patologias (Botões Táteis Rápidos)</div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width:40%;">Item Inspecionado (Patologia)</th>
+                <th style="width:160px; text-align:center;">Condição</th>
+                <th>Observação / Localização</th>
+              </tr>
+            </thead>
+            <tbody id="f2_patologias_tbody">
+              <!-- Gerado via script com botões pill -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section-title">Registros Finais - VT</div>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label>Anomalias encontradas (descrição e localização)</label>
+            <textarea name="f2_anomalias"></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label>Recomendações imediatas ao cliente</label>
+            <textarea name="f2_recomendacoes"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== FOLHA 3: LÍQUIDO PENETRANTE ==================== -->
+    <div class="sheet-card" id="sheet-folha3" data-sheet-id="folha3">
+      <div class="card-header">
+        <h2>Ficha de Campo – Folha 3: Líquido Penetrante (LP)</h2>
+        <button class="btn-header" onclick="toggleSheetDirect('folha3')" style="color:var(--danger); border-color:var(--danger);">✕ Ocultar</button>
+      </div>
+      <div class="card-body">
+        <div class="section-title">Detalhes do Ensaio LP</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nº do procedimento / revisão</label>
+            <input type="text" name="f3_procedimento" />
+          </div>
+          <div class="form-group">
+            <label>Normas de referência</label>
+            <input type="text" name="f3_normas" />
+          </div>
+          <div class="form-group">
+            <label>Tipo / Método (ex: II-A)</label>
+            <input type="text" name="f3_metodo" />
+          </div>
+          <div class="form-group full-width">
+            <label>Sistema</label>
+            <div class="checkbox-group">
+              <label class="radio-label"><input type="radio" name="f3_sistema_cor" value="Visivel" checked /> Visível (cor)</label>
+              <label class="radio-label"><input type="radio" name="f3_sistema_cor" value="Fluorescente" /> Fluorescente</label>
+              <span style="margin:0 6px; color:var(--border);">|</span>
+              <label class="radio-label"><input type="radio" name="f3_sistema_met" value="Solvente" checked /> Removível c/ solvente</label>
+              <label class="radio-label"><input type="radio" name="f3_sistema_met" value="Agua" /> Lavável c/ água</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Temperatura do material (°C)</label>
+            <input type="number" step="0.1" inputmode="decimal" name="f3_temp_mat" />
+          </div>
+          <div class="form-group">
+            <label>Iluminação no local (lux)</label>
+            <input type="number" inputmode="numeric" name="f3_ilum" />
+          </div>
+          <div class="form-group">
+            <label>Tempo de penetração (min)</label>
+            <input type="number" inputmode="numeric" name="f3_tempo_pen" />
+          </div>
+          <div class="form-group">
+            <label>Tempo de revelação (min)</label>
+            <input type="number" inputmode="numeric" name="f3_tempo_rev" />
+          </div>
+          <div class="form-group">
+            <label>Resultado Geral LP</label>
+            <div class="checkbox-group">
+              <label class="radio-label"><input type="radio" name="f3_resultado" value="Aprovado" checked /> Aprovado</label>
+              <label class="radio-label"><input type="radio" name="f3_resultado" value="Reprovado" /> Reprovado</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title">Registro dos Pontos / Descontinuidades</div>
+        <div class="table-container">
+          <table class="data-table" id="f3_descont_table">
+            <thead>
+              <tr>
+                <th>Junta / Peça</th>
+                <th style="width:55px;">Nº Ind.</th>
+                <th>Ref. Ponto 0</th>
+                <th style="width:100px;">Comp. (mm)</th>
+                <th>Tipo Descont.</th>
+                <th style="width:85px;">Região</th>
+                <th style="width:80px;">Laudo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Linhas -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== FOLHA 4: MEDIÇÃO DE ESPESSURA ==================== -->
+    <div class="sheet-card" id="sheet-folha4" data-sheet-id="folha4">
+      <div class="card-header">
+        <h2>Ficha de Campo – Folha 4: Medição de Espessura (ME)</h2>
+        <button class="btn-header" onclick="toggleSheetDirect('folha4')" style="color:var(--danger); border-color:var(--danger);">✕ Ocultar</button>
+      </div>
+      <div class="card-body">
+        <div class="section-title">Parâmetros e Calibração ME</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Aparelho / Modelo / ID</label>
+            <input type="text" name="f4_aparelho_info" placeholder="Ex: Mitech MT190 - ID 01" />
+          </div>
+          <div class="form-group">
+            <label>Transdutor (Modelo / Diâm.)</label>
+            <input type="text" name="f4_transdutor_info" placeholder="Ex: P5EE 10mm" />
+          </div>
+          <div class="form-group">
+            <label>Espessura nominal (mm)</label>
+            <input type="number" step="0.01" inputmode="decimal" id="f4_esp_nom" name="f4_esp_nom" placeholder="Ex: 9.53" />
+          </div>
+          <div class="form-group">
+            <label>Espessura mínima requerida (mm)</label>
+            <input type="number" step="0.01" inputmode="decimal" id="f4_esp_min" name="f4_esp_min" placeholder="Ex: 6.00" oninput="recalcME()" />
+          </div>
+        </div>
+
+        <div class="section-title">Matriz de Leituras (1 a 200) com Auto-Avanço</div>
+        <div class="me-summary-bar">
+          <div>Pontos medidos: <strong id="me_stat_count">0</strong></div>
+          <div>Mínima: <strong id="me_stat_min" style="color:var(--danger);">-</strong> mm</div>
+          <div>Máxima: <strong id="me_stat_max">-</strong> mm</div>
+          <div>Abaixo da Mínima: <strong id="me_stat_below" style="color:var(--danger); font-size:1.05rem;">0</strong></div>
+        </div>
+
+        <div class="me-grid" id="mePointsGrid">
+          <!-- 200 pontos com suporte a Enter automático -->
+        </div>
+
+        <div class="form-grid" style="margin-top:12px;">
+          <div class="form-group full-width">
+            <label class="checkbox-label"><input type="checkbox" name="f4_chk_bloco_ok" /> Aparelho conferido no bloco padrão antes e depois das medições</label>
+          </div>
+          <div class="form-group full-width">
+            <label>Anomalias e regiões com perda de espessura</label>
+            <textarea name="f4_anomalias"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== FOLHA 5: ULTRASSOM INDUSTRIAL ==================== -->
+    <div class="sheet-card" id="sheet-folha5" data-sheet-id="folha5">
+      <div class="card-header">
+        <h2>Ficha de Campo – Folha 5: Ultrassom Industrial (UT)</h2>
+        <button class="btn-header" onclick="toggleSheetDirect('folha5')" style="color:var(--danger); border-color:var(--danger);">✕ Ocultar</button>
+      </div>
+      <div class="card-body">
+        <div class="section-title">Detalhes do Ensaio UT</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Aparelho / Modelo / ID</label>
+            <input type="text" name="f5_aparelho" />
+          </div>
+          <div class="form-group">
+            <label>Transdutor (Freq. / Ângulo / ID)</label>
+            <input type="text" name="f5_transdutor" />
+          </div>
+          <div class="form-group">
+            <label>Resultado Geral UT</label>
+            <div class="checkbox-group">
+              <label class="radio-label"><input type="radio" name="f5_resultado" value="Aprovado" checked /> Aprovado</label>
+              <label class="radio-label"><input type="radio" name="f5_resultado" value="Reprovado" /> Reprovado</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title">Registro das Juntas Ensaiadas</div>
+        <div class="table-container">
+          <table class="data-table" id="f5_juntas_table">
+            <thead>
+              <tr>
+                <th style="width:130px;">Junta / Solda</th>
+                <th>Localização</th>
+                <th>Indicação (Pos., Prof., Ampl., Comp.)</th>
+                <th style="width:100px;">Resultado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Linhas -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== FOLHA 6: PARTÍCULA MAGNÉTICA ==================== -->
+    <div class="sheet-card" id="sheet-folha6" data-sheet-id="folha6">
+      <div class="card-header">
+        <h2>Ficha de Campo – Folha 6: Partícula Magnética (PM)</h2>
+        <button class="btn-header" onclick="toggleSheetDirect('folha6')" style="color:var(--danger); border-color:var(--danger);">✕ Ocultar</button>
+      </div>
+      <div class="card-body">
+        <div class="section-title">Detalhes do Ensaio PM</div>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label>Técnica</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label"><input type="checkbox" name="f6_tec_yoke" checked /> Yoke</label>
+              <label class="checkbox-label"><input type="checkbox" name="f6_tec_seca" /> Via seca</label>
+              <label class="checkbox-label"><input type="checkbox" name="f6_tec_umida" /> Via úmida</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Teste levantamento yoke (kg)</label>
+            <input type="number" step="0.1" inputmode="decimal" name="f6_yoke_teste" placeholder="Ex: 5.5" />
+          </div>
+          <div class="form-group">
+            <label>Resultado Geral PM</label>
+            <div class="checkbox-group">
+              <label class="radio-label"><input type="radio" name="f6_resultado" value="Aprovado" checked /> Aprovado</label>
+              <label class="radio-label"><input type="radio" name="f6_resultado" value="Reprovado" /> Reprovado</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title">Registro dos Pontos PM</div>
+        <div class="table-container">
+          <table class="data-table" id="f6_soldas_table">
+            <thead>
+              <tr>
+                <th style="width:120px;">Área / Solda</th>
+                <th>Localização</th>
+                <th style="width:95px;">Resultado</th>
+                <th>Indicação (Tipo, Comp.)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Linhas -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== FOLHA 7: CONCRETO ==================== -->
+    <div class="sheet-card" id="sheet-folha7" data-sheet-id="folha7">
+      <div class="card-header">
+        <h2>Ficha de Campo – Folha 7: Concreto</h2>
+        <button class="btn-header" onclick="toggleSheetDirect('folha7')" style="color:var(--danger); border-color:var(--danger);">✕ Ocultar</button>
+      </div>
+      <div class="card-body">
+        <div class="section-title">Esclerometria e Carbonatação</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Elemento / Localização</label>
+            <input type="text" name="f7_elemento" placeholder="Ex: Pilar P4" />
+          </div>
+          <div class="form-group">
+            <label>Cobrimento da armadura (mm)</label>
+            <input type="number" inputmode="numeric" name="f7_cobrimento" />
+          </div>
+        </div>
+
+        <div class="section-title">Tabela Esclerometria</div>
+        <div class="table-container">
+          <table class="data-table" id="f7_escl_table">
+            <thead>
+              <tr>
+                <th style="width:70px;">Área</th>
+                <th>Localização</th>
+                <th style="width:90px;">Ângulo</th>
+                <th style="width:110px;">Índice Médio</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Linhas -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal Seleção de Folhas -->
+  <div class="modal-backdrop" id="sheetModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="font-size:1rem;">Selecionar Folhas da Demanda</h3>
+        <button onclick="closeSheetModal()" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">Ative as folhas que farão parte desta inspeção:</p>
+        
+        <div class="sheet-toggle-item required">
+          <div><strong>Folha 1: Geral</strong><div style="font-size:0.75rem; color:var(--text-muted);">Dados e parecer (obrigatória)</div></div>
+          <span style="font-size:0.75rem; font-weight:700; color:var(--primary);">PADRÃO</span>
+        </div>
+
+        <div class="sheet-toggle-item">
+          <div><strong>Folha 2: Inspeção Visual (VT)</strong><div style="font-size:0.75rem; color:var(--text-muted);">Patologias e anomalias</div></div>
+          <label class="switch"><input type="checkbox" id="chk_sheet_folha2" onchange="toggleSheet('folha2', this.checked)"><span class="slider"></span></label>
+        </div>
+
+        <div class="sheet-toggle-item">
+          <div><strong>Folha 3: Líquido Penetrante (LP)</strong><div style="font-size:0.75rem; color:var(--text-muted);">Ensaio de descontinuidades</div></div>
+          <label class="switch"><input type="checkbox" id="chk_sheet_folha3" onchange="toggleSheet('folha3', this.checked)"><span class="slider"></span></label>
+        </div>
+
+        <div class="sheet-toggle-item">
+          <div><strong>Folha 4: Medição de Espessura (ME)</strong><div style="font-size:0.75rem; color:var(--text-muted);">Matriz 1 a 200 pontos</div></div>
+          <label class="switch"><input type="checkbox" id="chk_sheet_folha4" onchange="toggleSheet('folha4', this.checked)"><span class="slider"></span></label>
+        </div>
+
+        <div class="sheet-toggle-item">
+          <div><strong>Folha 5: Ultrassom Industrial (UT)</strong><div style="font-size:0.75rem; color:var(--text-muted);">Varredura e juntas</div></div>
+          <label class="switch"><input type="checkbox" id="chk_sheet_folha5" onchange="toggleSheet('folha5', this.checked)"><span class="slider"></span></label>
+        </div>
+
+        <div class="sheet-toggle-item">
+          <div><strong>Folha 6: Partícula Magnética (PM)</strong><div style="font-size:0.75rem; color:var(--text-muted);">Yoke e soldas</div></div>
+          <label class="switch"><input type="checkbox" id="chk_sheet_folha6" onchange="toggleSheet('folha6', this.checked)"><span class="slider"></span></label>
+        </div>
+
+        <div class="sheet-toggle-item">
+          <div><strong>Folha 7: Concreto</strong><div style="font-size:0.75rem; color:var(--text-muted);">Esclerometria e patologias</div></div>
+          <label class="switch"><input type="checkbox" id="chk_sheet_folha7" onchange="toggleSheet('folha7', this.checked)"><span class="slider"></span></label>
+        </div>
+
+        <button onclick="closeSheetModal()" style="width:100%; margin-top:12px; padding:10px; background:var(--primary); color:white; border:none; border-radius:6px; font-weight:700; cursor:pointer;">Concluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Histórico -->
+  <div class="modal-backdrop" id="historyModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="font-size:1rem;">Histórico de Inspeções Locais</h3>
+        <button onclick="closeHistoryModal()" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="font-size:0.78rem; color:var(--text-muted);">Salvo na memória local do aparelho</span>
+          <button onclick="exportBackupJSON()" style="font-size:0.75rem; padding:4px 8px; border:1px solid var(--border); border-radius:4px; background:var(--input-bg); cursor:pointer;">Backup JSON</button>
+        </div>
+        <div id="historyListContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra Inferior Fixa de Ações -->
+  <div class="bottom-bar">
+    <button class="btn-action btn-save" onclick="salvarInspecaoCompleta(true)">💾 Salvar</button>
+    <button class="btn-action btn-pdf" onclick="gerarPDFNativo()">📄 Baixar PDF</button>
+    <button class="btn-action btn-share" onclick="compartilhar()">🔗 Compartilhar</button>
+  </div>
+
+  <div class="toast" id="toast">Ação executada com sucesso!</div>
+
+  <script>
+    const SHEETS = [
+      { id: 'folha1', name: 'Folha 1: Geral', req: true },
+      { id: 'folha2', name: 'Folha 2: Visual', req: false },
+      { id: 'folha3', name: 'Folha 3: LP', req: false },
+      { id: 'folha4', name: 'Folha 4: Espessura', req: false },
+      { id: 'folha5', name: 'Folha 5: Ultrassom', req: false },
+      { id: 'folha6', name: 'Folha 6: PM', req: false },
+      { id: 'folha7', name: 'Folha 7: Concreto', req: false }
+    ];
+
+    let activeSheets = {
+      folha1: true, folha2: true, folha3: false, folha4: true, folha5: false, folha6: false, folha7: false
+    };
+
+    let currentInspectionId = null;
+    let patologiaStates = {}; // Armazena OK/NC/NA por patologia
+    let canvasDataMap = { sig_inspetor: null, sig_cliente: null };
+
+    // INDEXEDDB OFFLINE
+    const DB_NAME = 'NDT_FieldReports_DB';
+    let dbInstance = null;
+
+    function openDB() {
+      return new Promise((resolve) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains('inspections')) {
+            db.createObjectStore('inspections', { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = (e) => {
+          dbInstance = e.target.result;
+          updateHistoryCount();
+          resolve();
+        };
+        req.onerror = () => resolve();
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      initPatologias();
+      initMEGrid();
+      initTables();
+      initSignatures();
+      await openDB();
+      loadAutoSaveDraft();
+      renderSheetPills();
+      updateSheetVisibility();
+      recalcME();
+
+      document.getElementById('formRoot').addEventListener('input', () => {
+        autoSaveDraft();
+      });
+    });
+
+    // Modo Sol / Escuro
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('ndt_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    }
+    if (localStorage.getItem('ndt_theme') === 'dark') document.body.classList.add('dark-mode');
+
+    // 1. Navegação de Folhas
+    function renderSheetPills() {
+      const container = document.getElementById('sheetPillContainer');
+      let html = '';
+      SHEETS.forEach(s => {
+        if (activeSheets[s.id]) {
+          html += `<div class="sheet-pill active" onclick="scrollToSheet('${s.id}')">${s.name}</div>`;
+        }
+      });
+      html += `<button class="btn-manage-sheets" onclick="openSheetModal()">+ Folhas</button>`;
+      container.innerHTML = html;
+    }
+
+    function scrollToSheet(id) {
+      const el = document.getElementById('sheet-' + id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function openSheetModal() {
+      SHEETS.forEach(s => {
+        if (!s.req) {
+          const chk = document.getElementById('chk_sheet_' + s.id);
+          if (chk) chk.checked = !!activeSheets[s.id];
+        }
+      });
+      document.getElementById('sheetModal').classList.add('show');
+    }
+
+    function closeSheetModal() {
+      document.getElementById('sheetModal').classList.remove('show');
+      renderSheetPills();
+      updateSheetVisibility();
+      autoSaveDraft();
+    }
+
+    function toggleSheet(id, val) { activeSheets[id] = val; }
+    function toggleSheetDirect(id) {
+      activeSheets[id] = false;
+      renderSheetPills();
+      updateSheetVisibility();
+      autoSaveDraft();
+      showToast('Folha oculta.');
+    }
+    function autoSyncSheet(id, isChecked) {
+      activeSheets[id] = isChecked;
+      renderSheetPills();
+      updateSheetVisibility();
+      autoSaveDraft();
+    }
+
+    function updateSheetVisibility() {
+      SHEETS.forEach(s => {
+        const card = document.getElementById('sheet-' + s.id);
+        if (card) {
+          if (activeSheets[s.id]) card.classList.add('visible');
+          else card.classList.remove('visible');
+        }
+      });
+    }
+
+    // 2. Patologias da Folha 2 com Botões Táteis Rápidos
+    const PATOLOGIAS_LIST = [
+      "Corrosão generalizada", "Corrosão localizada / alveolar / pite", "Corrosão galvânica",
+      "Perda de seção", "Amassamento (mossa)", "Empenamento / deformação / flambagem",
+      "Trinca ou fissura", "Soldas (mordedura, porosidade, respingos)",
+      "Ligações parafusadas (faltantes, frouxos, corroídos)", "Chumbadores, placa de base e apoios",
+      "Desgaste / erosão", "Incrustação / acúmulo de material",
+      "Sistema de pintura / revestimento (grau de oxidação)",
+      "Concreto (desplacamento, armadura exposta, ninho, lixiviação)",
+      "Infiltração / vazamentos / manchas", "Isolamento térmico / proteção", "Outro item"
+    ];
+
+    function initPatologias() {
+      const tbody = document.getElementById('f2_patologias_tbody');
+      tbody.innerHTML = PATOLOGIAS_LIST.map((pat, idx) => {
+        patologiaStates[idx] = patologiaStates[idx] || 'OK';
+        return `
+          <tr>
+            <td><strong>${pat}</strong></td>
+            <td style="text-align:center;">
+              <div class="pill-btn-group" id="grp_pat_${idx}">
+                <button type="button" class="pill-btn active-ok" onclick="setPatState(${idx}, 'OK')">OK</button>
+                <button type="button" class="pill-btn" onclick="setPatState(${idx}, 'NC')">NC</button>
+                <button type="button" class="pill-btn" onclick="setPatState(${idx}, 'NA')">NA</button>
+              </div>
+            </td>
+            <td><input type="text" id="obs_pat_${idx}" name="f2_pat_obs_${idx}" placeholder="Observação / localização..." /></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function setPatState(idx, state) {
+      patologiaStates[idx] = state;
+      const grp = document.getElementById('grp_pat_' + idx);
+      const btns = grp.querySelectorAll('.pill-btn');
+      btns[0].className = 'pill-btn' + (state === 'OK' ? ' active-ok' : '');
+      btns[1].className = 'pill-btn' + (state === 'NC' ? ' active-nc' : '');
+      btns[2].className = 'pill-btn' + (state === 'NA' ? ' active-na' : '');
+
+      const obsInput = document.getElementById('obs_pat_' + idx);
+      if (state === 'NC') {
+        obsInput.focus();
+        obsInput.style.borderColor = 'var(--danger)';
+      } else {
+        obsInput.style.borderColor = 'var(--border)';
+      }
+      autoSaveDraft();
+    }
+
+    // 3. Matriz ME com Auto-Avanço de Foco (Enter pula para próximo ponto)
+    function initMEGrid() {
+      const grid = document.getElementById('mePointsGrid');
+      let html = '';
+      for (let i = 1; i <= 200; i++) {
+        html += `
+          <div class="me-item" id="me_box_${i}">
+            <span class="pt-num">${i}.</span>
+            <input type="number" step="0.01" inputmode="decimal" id="me_val_${i}" name="me_val_${i}" placeholder="-" 
+              oninput="onMEPointInput(${i})" 
+              onkeydown="onMEKeyDown(event, ${i})" />
+            <label style="font-size:0.68rem; color:var(--danger); cursor:pointer;" title="Abaixo da espessura mínima">
+              <input type="checkbox" id="me_chk_${i}" name="me_chk_${i}" onchange="recalcME()" /> <mín
+            </label>
+          </div>
+        `;
+      }
+      grid.innerHTML = html;
+    }
+
+    function onMEKeyDown(e, idx) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const next = document.getElementById('me_val_' + (idx + 1));
+        if (next) {
+          next.focus();
+          next.select();
+        }
+      }
+    }
+
+    function onMEPointInput(idx) {
+      const valInput = document.getElementById('me_val_' + idx);
+      const chkInput = document.getElementById('me_chk_' + idx);
+      const minInput = document.getElementById('f4_esp_min');
+      const box = document.getElementById('me_box_' + idx);
+
+      const val = parseFloat(valInput.value);
+      const minVal = parseFloat(minInput.value);
+
+      if (!isNaN(val) && !isNaN(minVal) && minVal > 0) {
+        if (val < minVal) {
+          chkInput.checked = true;
+          box.classList.add('reproved');
+        } else {
+          chkInput.checked = false;
+          box.classList.remove('reproved');
+        }
+      }
+      recalcME();
+    }
+
+    function recalcME() {
+      let count = 0;
+      let min = Infinity;
+      let max = -Infinity;
+      let belowCount = 0;
+      const minThreshold = parseFloat(document.getElementById('f4_esp_min').value);
+
+      for (let i = 1; i <= 200; i++) {
+        const valEl = document.getElementById('me_val_' + i);
+        const chkEl = document.getElementById('me_chk_' + i);
+        const box = document.getElementById('me_box_' + i);
+
+        if (valEl && valEl.value.trim() !== '') {
+          const v = parseFloat(valEl.value);
+          if (!isNaN(v)) {
+            count++;
+            if (v < min) min = v;
+            if (v > max) max = v;
+            if (!isNaN(minThreshold) && minThreshold > 0 && v < minThreshold) {
+              chkEl.checked = true;
+              box.classList.add('reproved');
+            }
+          }
+        }
+        if (chkEl && chkEl.checked) belowCount++;
+      }
+
+      document.getElementById('me_stat_count').innerText = count;
+      document.getElementById('me_stat_min').innerText = count > 0 ? min.toFixed(2) : '-';
+      document.getElementById('me_stat_max').innerText = count > 0 ? max.toFixed(2) : '-';
+      document.getElementById('me_stat_below').innerText = belowCount;
+    }
+
+    function initTables() {
+      // LP
+      const lpTbody = document.querySelector('#f3_descont_table tbody');
+      let lpHtml = '';
+      for (let i = 1; i <= 5; i++) {
+        lpHtml += `
+          <tr>
+            <td><input type="text" name="f3_pt_junta_${i}" /></td>
+            <td><input type="text" name="f3_pt_num_${i}" value="${i}" style="text-align:center;" /></td>
+            <td><input type="text" name="f3_pt_ref0_${i}" /></td>
+            <td><input type="number" step="0.1" inputmode="decimal" name="f3_pt_comp_${i}" /></td>
+            <td><input type="text" name="f3_pt_tipo_${i}" placeholder="TL, PO, MO..." /></td>
+            <td><select name="f3_pt_regiao_${i}"><option value="MB">MB</option><option value="ZTA">ZTA</option><option value="C">C</option><option value="P">P</option></select></td>
+            <td><select name="f3_pt_laudo_${i}"><option value="A">Aprov.</option><option value="R">Reprov.</option></select></td>
+          </tr>
+        `;
+      }
+      lpTbody.innerHTML = lpHtml;
+
+      // UT
+      const utTbody = document.querySelector('#f5_juntas_table tbody');
+      let utHtml = '';
+      for (let i = 1; i <= 4; i++) {
+        utHtml += `
+          <tr>
+            <td><input type="text" name="f5_junta_${i}" /></td>
+            <td><input type="text" name="f5_loc_${i}" /></td>
+            <td><input type="text" name="f5_ind_${i}" placeholder="Pos., prof., ampl." /></td>
+            <td><select name="f5_laudo_${i}"><option value="A">Aprovado</option><option value="R">Reprovado</option></select></td>
+          </tr>
+        `;
+      }
+      utTbody.innerHTML = utHtml;
+
+      // PM
+      const pmTbody = document.querySelector('#f6_soldas_table tbody');
+      let pmHtml = '';
+      for (let i = 1; i <= 4; i++) {
+        pmHtml += `
+          <tr>
+            <td><input type="text" name="f6_solda_${i}" /></td>
+            <td><input type="text" name="f6_loc_${i}" /></td>
+            <td><select name="f6_laudo_${i}"><option value="A">Aprov.</option><option value="R">Reprov.</option></select></td>
+            <td><input type="text" name="f6_ind_${i}" /></td>
+          </tr>
+        `;
+      }
+      pmTbody.innerHTML = pmHtml;
+
+      // Concreto
+      const esclTbody = document.querySelector('#f7_escl_table tbody');
+      let esclHtml = '';
+      for (let i = 1; i <= 3; i++) {
+        esclHtml += `
+          <tr>
+            <td><strong>Área ${i}</strong></td>
+            <td><input type="text" name="f7_escl_elem_${i}" /></td>
+            <td><input type="text" name="f7_escl_ang_${i}" placeholder="0°, -90°" /></td>
+            <td><input type="number" step="0.1" inputmode="decimal" name="f7_escl_val_${i}" /></td>
+          </tr>
+        `;
+      }
+      esclTbody.innerHTML = esclHtml;
+    }
+
+    // 4. Assinatura Touch em Canvas
+    function initSignatures() {
+      setupCanvas('sig_inspetor');
+      setupCanvas('sig_cliente');
+    }
+
+    function setupCanvas(canvasId) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let painting = false;
+
+      function resize() {
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * 2;
+        canvas.height = rect.height * 2;
+        ctx.scale(2, 2);
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        if (canvasDataMap[canvasId]) {
+          const img = new Image();
+          img.onload = () => ctx.drawImage(img, 0, 0, rect.width, rect.height);
+          img.src = canvasDataMap[canvasId];
+        }
+      }
+      setTimeout(resize, 200);
+
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+      }
+
+      function start(e) {
+        painting = true;
+        ctx.beginPath();
+        const pos = getPos(e);
+        ctx.moveTo(pos.x, pos.y);
+      }
+      function draw(e) {
+        if (!painting) return;
+        const pos = getPos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+      }
+      function stop() {
+        if (painting) {
+          painting = false;
+          canvasDataMap[canvasId] = canvas.toDataURL();
+          autoSaveDraft();
+        }
+      }
+
+      canvas.addEventListener('mousedown', start);
+      canvas.addEventListener('mousemove', draw);
+      window.addEventListener('mouseup', stop);
+
+      canvas.addEventListener('touchstart', (e) => { e.preventDefault(); start(e); });
+      canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+      window.addEventListener('touchend', stop);
+    }
+
+    function clearSig(canvasId) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvasDataMap[canvasId] = null;
+      autoSaveDraft();
+    }
+
+    // 5. Dados & Armazenamento Local
+    function getFormDataSnapshot() {
+      const form = document.getElementById('formRoot');
+      const inputs = form.querySelectorAll('input, select, textarea');
+      const fields = {};
+      inputs.forEach(inp => {
+        if (!inp.name) return;
+        if (inp.type === 'checkbox') fields[inp.name] = inp.checked;
+        else if (inp.type === 'radio') {
+          if (inp.checked) fields[inp.name] = inp.value;
+        } else {
+          fields[inp.name] = inp.value;
+        }
+      });
+      return {
+        id: currentInspectionId || ('inspec_' + Date.now()),
+        tag: document.getElementById('f1_tag_input').value || 'SEM_TAG',
+        ativo: document.querySelector('input[name="f1_ativo"]').value || 'Equipamento',
+        data: document.getElementById('f1_data_input').value || new Date().toISOString().split('T')[0],
+        parecer: document.querySelector('input[name="f1_parecer"]:checked')?.value || 'Apto',
+        activeSheets: { ...activeSheets },
+        patologiaStates: { ...patologiaStates },
+        signatures: { ...canvasDataMap },
+        fields: fields,
+        timestamp: new Date().toISOString()
+      };
+    }
+
+    function autoSaveDraft() {
+      const snap = getFormDataSnapshot();
+      localStorage.setItem('ndt_ficha_draft', JSON.stringify(snap));
+    }
+
+    function loadAutoSaveDraft() {
+      const raw = localStorage.getItem('ndt_ficha_draft');
+      if (!raw) {
+        document.getElementById('f1_data_input').value = new Date().toISOString().split('T')[0];
+        return;
+      }
+      try {
+        const snap = JSON.parse(raw);
+        currentInspectionId = snap.id;
+        applySnapshot(snap);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function applySnapshot(snap) {
+      if (snap.activeSheets) activeSheets = { ...activeSheets, ...snap.activeSheets };
+      if (snap.patologiaStates) {
+        patologiaStates = { ...snap.patologiaStates };
+        Object.keys(patologiaStates).forEach(idx => setPatState(idx, patologiaStates[idx]));
+      }
+      if (snap.signatures) {
+        canvasDataMap = { ...snap.signatures };
+        setupCanvas('sig_inspetor');
+        setupCanvas('sig_cliente');
+      }
+      if (snap.fields) {
+        Object.keys(snap.fields).forEach(name => {
+          const val = snap.fields[name];
+          const elements = document.querySelectorAll(`[name="${name}"]`);
+          if (elements.length === 1) {
+            const el = elements[0];
+            if (el.type === 'checkbox') el.checked = !!val;
+            else el.value = val;
+          } else if (elements.length > 1) {
+            elements.forEach(radio => {
+              if (radio.type === 'radio' && radio.value === val) radio.checked = true;
+            });
+          }
+        });
+      }
+      renderSheetPills();
+      updateSheetVisibility();
+      recalcME();
+    }
+
+    async function salvarInspecaoCompleta(showToastMsg = true) {
+      const snap = getFormDataSnapshot();
+      currentInspectionId = snap.id;
+      if (dbInstance) {
+        const tx = dbInstance.transaction('inspections', 'readwrite');
+        tx.objectStore('inspections').put(snap);
+        tx.oncomplete = () => {
+          updateHistoryCount();
+          if (showToastMsg) showToast(`Inspeção [${snap.tag}] salva e arquivada!`);
+        };
+      } else {
+        localStorage.setItem('ndt_ficha_draft', JSON.stringify(snap));
+        if (showToastMsg) showToast(`Inspeção [${snap.tag}] salva!`);
+      }
+    }
+
+    async function updateHistoryCount() {
+      if (!dbInstance) return;
+      const tx = dbInstance.transaction('inspections', 'readonly');
+      const req = tx.objectStore('inspections').count();
+      req.onsuccess = () => {
+        document.getElementById('histCount').innerText = req.result;
+      };
+    }
+
+    async function openHistoryModal() {
+      const container = document.getElementById('historyListContainer');
+      if (!dbInstance) return;
+      const tx = dbInstance.transaction('inspections', 'readonly');
+      const getAllReq = tx.objectStore('inspections').getAll();
+
+      getAllReq.onsuccess = () => {
+        const items = getAllReq.result.sort((a,b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+        if (items.length === 0) {
+          container.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size:0.85rem; padding:18px;">Nenhuma inspeção arquivada.</p>';
+        } else {
+          container.innerHTML = items.map(it => `
+            <div class="history-card">
+              <div class="history-card-header">
+                <strong>TAG: ${it.tag}</strong>
+                <span style="font-size:0.75rem; font-weight:700; color:${it.parecer === 'Apto' ? '#10b981' : '#ef4444'};">${it.parecer}</span>
+              </div>
+              <div style="font-size:0.78rem; color:var(--text-muted);">${it.ativo} • ${it.data}</div>
+              <div class="history-card-actions">
+                <button class="btn-hist primary" onclick="carregarDoHistorico('${it.id}')">Carregar</button>
+                <button class="btn-hist" onclick="baixarPDFDoItem('${it.id}')">PDF</button>
+                <button class="btn-hist danger" onclick="apagarDoHistorico('${it.id}')">Excluir</button>
+              </div>
+            </div>
+          `).join('');
+        }
+        document.getElementById('historyModal').classList.add('show');
+      };
+    }
+
+    function closeHistoryModal() { document.getElementById('historyModal').classList.remove('show'); }
+
+    async function carregarDoHistorico(id) {
+      const tx = dbInstance.transaction('inspections', 'readonly');
+      const req = tx.objectStore('inspections').get(id);
+      req.onsuccess = () => {
+        if (req.result) {
+          currentInspectionId = req.result.id;
+          applySnapshot(req.result);
+          closeHistoryModal();
+          showToast(`Inspeção [${req.result.tag}] carregada.`);
+        }
+      };
+    }
+
+    async function apagarDoHistorico(id) {
+      if (confirm('Deseja excluir esta inspeção do histórico?')) {
+        const tx = dbInstance.transaction('inspections', 'readwrite');
+        tx.objectStore('inspections').delete(id);
+        tx.oncomplete = () => {
+          updateHistoryCount();
+          openHistoryModal();
+          showToast('Inspeção excluída.');
+        };
+      }
+    }
+
+    function exportBackupJSON() {
+      const tx = dbInstance.transaction('inspections', 'readonly');
+      const req = tx.objectStore('inspections').getAll();
+      req.onsuccess = () => {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(req.result, null, 2));
+        const dl = document.createElement('a');
+        dl.setAttribute("href", dataStr);
+        dl.setAttribute("download", `Backup_NDT_${new Date().toISOString().split('T')[0]}.json`);
+        dl.click();
+      };
+    }
+
+    function novaInspecao() {
+      if (confirm('Iniciar uma Nova Inspeção? Os campos serão limpos para um novo ensaio.')) {
+        currentInspectionId = 'inspec_' + Date.now();
+        localStorage.removeItem('ndt_ficha_draft');
+        location.reload();
+      }
+    }
+
+    // 6. Geração Direta e Segura de PDF (100% Nativo e Compatível Offline)
+    function gerarPDFNativo() {
+      salvarInspecaoCompleta(false);
+      const tag = (document.getElementById('f1_tag_input').value || 'EQUIPAMENTO').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+      const data = document.getElementById('f1_data_input').value || new Date().toISOString().split('T')[0];
+      const filename = `Ficha_Campo_${tag}_${data}`;
+      
+      const originalTitle = document.title;
+      document.title = filename;
+      window.print();
+      setTimeout(() => { document.title = originalTitle; }, 1000);
+    }
+
+    async function baixarPDFDoItem(id) {
+      await carregarDoHistorico(id);
+      gerarPDFNativo();
+    }
+
+    async function compartilhar() {
+      salvarInspecaoCompleta(false);
+      const tag = document.getElementById('f1_tag_input').value || 'Equipamento';
+      const data = document.getElementById('f1_data_input').value || '';
+      const shareData = {
+        title: `Ficha de Campo NDT - ${tag}`,
+        text: `Ficha de inspeção NDT - TAG: ${tag} (${data}).`,
+        url: window.location.href
+      };
+
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+        } catch (err) {
+          gerarPDFNativo();
+        }
+      } else {
+        gerarPDFNativo();
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 2600);
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => console.log('Offline ativo.'));
+      });
+    }
+  </script>
+</body>
+</html>
